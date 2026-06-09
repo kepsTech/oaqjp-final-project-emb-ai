@@ -1,3 +1,7 @@
+"""
+Flask server for the Emotion Detection web application.
+"""
+
 from flask import Flask, render_template, request
 from EmotionDetection import emotion_detector
 
@@ -6,14 +10,22 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
+    """Render the home page."""
     return render_template("index.html")
 
 
 @app.route("/emotionDetector")
 def emotion_detector_route():
+    """Analyze user text and return emotion detection result."""
     text_to_analyze = request.args.get("textToAnalyze")
 
+    if text_to_analyze is None or text_to_analyze.strip() == "":
+        return "Invalid text! Please try again!"
+
     response = emotion_detector(text_to_analyze)
+
+    if response["dominant_emotion"] is None:
+        return "Invalid text! Please try again!"
 
     return (
         "For the given statement, the system response is "
@@ -25,7 +37,6 @@ def emotion_detector_route():
         f"The dominant emotion is {response['dominant_emotion']}."
     )
 
-
 if __name__ == "__main__":
-    app.run(host="localhost", port=5000)
+    app.run(host="0.0.0.0", port=5000)
     
